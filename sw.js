@@ -1,4 +1,4 @@
-const VERSION = 'v2';
+const VERSION = 'v3';
 const CACHE = `tack-sharp-${VERSION}`;
 
 const SHELL = [
@@ -36,6 +36,7 @@ const SHELL = [
   'js/ui/gearPanel.js',
   'js/ui/summary.js',
   'js/ui/howItWorks.js',
+  'js/ui/freePanel.js',
 ];
 
 const ASSETS = [

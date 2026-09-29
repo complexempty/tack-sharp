@@ -244,3 +244,15 @@ export function solveFree(locked, values, options) {
 
   return { ok: false, error: 'unsupported' };
 }
+
+export function lockField(order, field) {
+  if (order.includes(field)) return [...order.filter((entry) => entry !== field), field];
+  const grown = [...order, field];
+  const releaseOldest = grown.slice(1);
+  if (!isDegenerate(releaseOldest)) return releaseOldest;
+  return [grown[0], ...grown.slice(2)];
+}
+
+export function computedFields(locked) {
+  return FIELDS.filter((field) => !locked.includes(field));
+}

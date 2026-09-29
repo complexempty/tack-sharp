@@ -10,6 +10,7 @@ import { mountStackPanel } from './ui/stackPanel.js';
 import { mountTierPanel } from './ui/tierPanel.js';
 import { mountGearPanel } from './ui/gearPanel.js';
 import { mountSummary } from './ui/summary.js';
+import { mountFreePanel } from './ui/freePanel.js';
 import { mountHowItWorks } from './ui/howItWorks.js';
 
 function byId(id) {
@@ -80,6 +81,7 @@ function start() {
       store,
     }),
     summary: mountSummary({ host: byId('summary') }),
+    free: mountFreePanel({ host: byId('free-fields'), noteHost: byId('free-note'), store }),
   };
 
   mountTheme(byId('appearance-controls'));
@@ -93,6 +95,10 @@ function start() {
       tab.button.setAttribute('aria-selected', String(selected));
       tab.panel.hidden = !selected;
     }
+
+    const subjectMode = state.mode === 'subject';
+    for (const id of ['verdict-section', 'details-section']) byId(id).hidden = !subjectMode;
+    byId('standard-section').hidden = false;
 
     unitsChip.textContent = state.units;
     cameraChip.textContent = shortName(view.camera);
@@ -111,8 +117,10 @@ function start() {
     panels.verdict.update(view, state);
     panels.details.update(view, state);
     panels.stack.update(view, state);
+    if (!subjectMode) byId('stack-section').hidden = true;
     panels.gear.update(view, state);
     panels.summary.update(view, state);
+    panels.free.update(view, state);
   }
 
   store.subscribe(render);

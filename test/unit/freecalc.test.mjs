@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import { findCamera } from '../../js/data/cameras.js';
 import { tierLimit } from '../../js/data/tiers.js';
 import { DIFFRACTION_K } from '../../js/core/optics.js';
-import { FIELDS, isDegenerate, solveFree } from '../../js/core/freecalc.js';
+import { FIELDS, computedFields, isDegenerate, lockField, solveFree } from '../../js/core/freecalc.js';
 
 const a7r6 = findCamera('a7r6');
 const limit = tierLimit('critical', a7r6);
@@ -102,4 +102,38 @@ test('solved aperture takes the wider root', () => {
   assert.equal(solved.ok, true);
   const peak = Math.sqrt(limit * limit) / (DIFFRACTION_K * Math.SQRT2);
   assert.ok(solved.values.aperture < peak, 'wider than the peak aperture');
+});
+
+test('locking rotates out the oldest lock', () => {
+  const start = ['focalLength', 'aperture', 'focus'];
+  assert.deepEqual(lockField(start, 'near'), ['aperture', 'focus', 'near']);
+});
+
+test('locking never leaves the degenerate set, releasing the second oldest instead', () => {
+  const afterNear = lockField(['focalLength', 'aperture', 'focus'], 'near');
+  const afterFar = lockField(afterNear, 'far');
+  assert.equal(isDegenerate(afterFar), false);
+  assert.deepEqual(afterFar, ['aperture', 'near', 'far']);
+});
+
+test('re-locking a field already locked just makes it the newest', () => {
+  const order = ['focalLength', 'aperture', 'focus'];
+  assert.deepEqual(lockField(order, 'focalLength'), ['aperture', 'focus', 'focalLength']);
+  assert.equal(lockField(order, 'focalLength').length, 3);
+});
+
+test('a long rotation never reaches the degenerate set', () => {
+  let order = ['focalLength', 'aperture', 'focus'];
+  const sequence = ['near', 'far', 'focus', 'near', 'far', 'focus', 'aperture', 'near', 'far', 'focalLength'];
+  for (const field of sequence) {
+    order = lockField(order, field);
+    assert.equal(order.length, 3, `after ${field}`);
+    assert.equal(isDegenerate(order), false, `after ${field}: ${order.join(',')}`);
+    assert.ok(order.includes(field), `${field} became locked`);
+    assert.equal(new Set(order).size, 3, 'no duplicates');
+  }
+});
+
+test('computed fields are the two that are not locked', () => {
+  assert.deepEqual(computedFields(['focalLength', 'aperture', 'focus']).sort(), ['far', 'near']);
 });

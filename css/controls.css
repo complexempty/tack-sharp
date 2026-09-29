@@ -275,3 +275,42 @@
 #verdict-options .chip {
   min-height: var(--control-min);
 }
+
+.free-row {
+  grid-template-columns: 1fr auto;
+  grid-auto-flow: column;
+}
+
+.free-head {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-xs);
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.free-row.computed .free-head {
+  color: var(--accent);
+}
+
+.lock {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.free-row.computed .lock {
+  color: var(--accent);
+}
+
+.free-row .chip {
+  min-height: var(--control-min);
+}
