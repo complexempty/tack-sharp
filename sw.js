@@ -1,4 +1,4 @@
-const VERSION = 'v1';
+const VERSION = 'v2';
 const CACHE = `tack-sharp-${VERSION}`;
 
 const SHELL = [
@@ -24,6 +24,18 @@ const SHELL = [
   'js/core/freecalc.js',
   'js/core/stack.js',
   'js/core/units.js',
+  'js/core/scene.js',
+  'js/state/store.js',
+  'js/state/persist.js',
+  'js/ui/widgets.js',
+  'js/ui/subjectPanel.js',
+  'js/ui/verdict.js',
+  'js/ui/details.js',
+  'js/ui/stackPanel.js',
+  'js/ui/tierPanel.js',
+  'js/ui/gearPanel.js',
+  'js/ui/summary.js',
+  'js/ui/howItWorks.js',
 ];
 
 const ASSETS = [

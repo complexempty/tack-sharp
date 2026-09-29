@@ -212,7 +212,7 @@ export function evaluate(scene) {
 }
 
 export function verdictState(blur, limit) {
-  if (blur <= limit) return blur >= limit * (1 - MARGINAL_BAND) ? 'marginal' : 'pass';
+  if (blur <= limit) return 'pass';
   return blur <= limit * (1 + MARGINAL_BAND) ? 'marginal' : 'fail';
 }
 

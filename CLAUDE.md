@@ -112,7 +112,7 @@ Focus point:
 
 Verdict, three states:
 - Pass: "<subject> will be tack sharp", with the tier limit and the worst-edge blur.
-- Marginal: best blur within 10% of the limit either side. Say it is borderline and inside the model's own uncertainty, then show the same options as a fail.
+- Marginal: blur is over the limit but by no more than 10%. Say it is borderline and inside the model's own uncertainty, then show the same options as a fail. The band is deliberately one-sided: at or under the limit is a pass, because the limit is the definition of sharp, and a symmetric band would mark almost every "widest that works" answer borderline, since one third of a stop is about 12% of blur.
 - Fail: a headline, the best achievable blur and its multiple of the limit, then these options:
   - Apertures that would work, if the one set doesn't.
   - Step back to X at a given aperture. Use the set aperture if it's feasible, otherwise the stack aperture. Note that the subject gets smaller in the frame.
