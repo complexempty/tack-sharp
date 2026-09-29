@@ -312,7 +312,7 @@ Node unit tests for the math:
 - a7R VI pixel pitch 3.6008 µm, and Pixel-level limit 7.2015 µm.
 - All nine free-calculator lock combinations round-trip exactly.
 - Hyperfocal, near and far match the formulas. Hyperfocal at 24 mm f/8 Critical is 5.587 m sensor-plane, with a near limit of 2.806 m.
-- Minimum sensor distance 4f is 0.10 / 0.34 / 0.80 m at 24 / 85 / 200 mm.
+- Minimum sensor distance 4f is 96 / 340 / 800 mm at 24 / 85 / 200 mm.
 - Stack aperture is f/5.6 at Pixel-level and f/11 at Critical, at negligible magnification.
 - a7R VI, perfect lens, diffraction on, under the locked distance model:
 

@@ -14,6 +14,16 @@ const SHELL = [
   'js/app.js',
   'js/pwa.js',
   'js/ui/theme.js',
+  'js/core/distance.js',
+  'js/core/optics.js',
+  'js/core/solve.js',
+  'js/core/stops.js',
+  'js/core/subjects.js',
+  'js/data/cameras.js',
+  'js/data/tiers.js',
+  'js/core/freecalc.js',
+  'js/core/stack.js',
+  'js/core/units.js',
 ];
 
 const ASSETS = [
