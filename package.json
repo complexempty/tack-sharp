@@ -1,0 +1,16 @@
+{
+  "name": "tack-sharp",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Depth-of-field and tack sharp focus solver",
+  "scripts": {
+    "test": "node --test \"test/unit/*.test.mjs\"",
+    "serve": "node tools/serve.mjs",
+    "e2e": "playwright test",
+    "icons": "node tools/make-icons.mjs"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.49.0"
+  }
+}

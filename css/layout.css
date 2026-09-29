@@ -1,0 +1,109 @@
+.shell {
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: 0 var(--gutter) calc(var(--gap-xl) + env(safe-area-inset-bottom, 0px));
+}
+
+.app-header {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: var(--gap-sm);
+  padding: calc(var(--gap) + env(safe-area-inset-top, 0px)) 0 var(--gap);
+  background: var(--bg);
+}
+
+.app-header h1 {
+  flex: 0 0 auto;
+  font-size: 19px;
+  letter-spacing: 0.01em;
+}
+
+.app-header .spacer {
+  flex: 1 1 auto;
+}
+
+.section {
+  margin-top: var(--gap-lg);
+}
+
+.section > h2 {
+  font-family: var(--font-condensed);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: var(--gap-sm);
+}
+
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: var(--gap);
+}
+
+.panel + .panel {
+  margin-top: var(--gap-sm);
+}
+
+.tabs {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  gap: var(--gap-xs);
+  padding: 2px;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+
+.tabs button {
+  flex: 1 1 0;
+  min-height: var(--control-min);
+  padding: 0 var(--gap-sm);
+  background: transparent;
+  border: 0;
+  border-radius: calc(var(--radius) - 3px);
+  color: var(--muted);
+  font-family: var(--font-condensed);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+}
+
+.tabs button[aria-selected='true'] {
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: var(--shadow);
+}
+
+.stage-wrap {
+  position: sticky;
+  top: env(safe-area-inset-top, 0px);
+  z-index: 2;
+  margin-top: var(--gap-sm);
+  padding-bottom: var(--gap-sm);
+  background: var(--bg);
+}
+
+.grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--gap-sm);
+}
+
+.grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--gap-sm);
+}
+
+@media (max-width: 380px) {
+  .grid-3 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

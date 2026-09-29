@@ -1,0 +1,56 @@
+:root {
+  --bg: #151a1f;
+  --surface: #1c232a;
+  --surface-2: #242d36;
+  --stage: #10151a;
+  --line: #2c3640;
+  --line-strong: #55626e;
+  --text: #e3e7eb;
+  --muted: #8d99a5;
+  --accent: #8cb4de;
+  --sharp: #4dd19a;
+  --warn: #e0b443;
+  --soft: #e2654c;
+  --accent-wash: rgba(140, 180, 222, 0.14);
+  --sharp-wash: rgba(77, 209, 154, 0.14);
+  --warn-wash: rgba(224, 180, 67, 0.14);
+  --soft-wash: rgba(226, 101, 76, 0.14);
+  --halo: rgba(21, 26, 31, 0.82);
+  --shadow: 0 6px 24px rgba(0, 0, 0, 0.36);
+
+  --font-body: 'Barlow', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-condensed: 'Barlow Semi Condensed', 'Barlow', system-ui, sans-serif;
+
+  --gutter: 16px;
+  --content-max: 600px;
+  --control-min: 38px;
+  --radius-sm: 6px;
+  --radius: 10px;
+  --radius-lg: 14px;
+  --gap-xs: 4px;
+  --gap-sm: 8px;
+  --gap: 12px;
+  --gap-lg: 18px;
+  --gap-xl: 26px;
+}
+
+:root[data-theme='light'] {
+  --bg: #eef1f3;
+  --surface: #ffffff;
+  --surface-2: #e3e8ec;
+  --stage: #dde3e8;
+  --line: #cfd6dd;
+  --line-strong: #8e9aa6;
+  --text: #17202a;
+  --muted: #56626e;
+  --accent: #2a64a0;
+  --sharp: #178f60;
+  --warn: #b07c05;
+  --soft: #bf4630;
+  --accent-wash: rgba(42, 100, 160, 0.12);
+  --sharp-wash: rgba(23, 143, 96, 0.12);
+  --warn-wash: rgba(176, 124, 5, 0.12);
+  --soft-wash: rgba(191, 70, 48, 0.12);
+  --halo: rgba(255, 255, 255, 0.86);
+  --shadow: 0 6px 22px rgba(23, 32, 42, 0.14);
+}

@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Tack Sharp</title>
+<meta name="description" content="Depth-of-field and tack sharp focus solver">
+<meta name="theme-color" content="#151a1f">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="stylesheet" href="css/fonts.css">
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/layout.css">
+<link rel="stylesheet" href="css/controls.css">
+<link rel="stylesheet" href="css/diagram.css">
+<script>
+(function () {
+  var stored = 'dark';
+  try {
+    var raw = localStorage.getItem('tacksharp.theme');
+    if (raw === 'auto' || raw === 'light' || raw === 'dark') stored = raw;
+  } catch (e) {}
+  var resolved = stored;
+  if (stored === 'auto') {
+    resolved = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+  }
+  document.documentElement.dataset.theme = resolved;
+  document.documentElement.dataset.themePref = stored;
+})();
+</script>
+</head>
+<body>
+<div class="shell">
+
+  <header class="app-header">
+    <h1>Tack Sharp</h1>
+    <span class="spacer"></span>
+    <button type="button" class="chip" id="camera-chip" aria-pressed="false">a7R VI</button>
+    <button type="button" class="chip" id="units-chip" aria-pressed="false">ft</button>
+  </header>
+
+  <nav class="tabs" id="mode-tabs" role="tablist" aria-label="Mode">
+    <button type="button" role="tab" id="tab-subject" aria-controls="panel-subject" aria-selected="true">Subject</button>
+    <button type="button" role="tab" id="tab-free" aria-controls="panel-free" aria-selected="false">Free calculator</button>
+  </nav>
+
+  <div class="stage-wrap" id="stage-wrap">
+    <div class="stage" id="stage">
+      <div class="stage-bar">
+        <button type="button" id="view-closeup" aria-pressed="true">Close-up</button>
+        <button type="button" id="view-scene" aria-pressed="false">Whole scene</button>
+        <span class="spacer"></span>
+        <button type="button" id="stage-collapse" aria-expanded="true">Hide</button>
+      </div>
+      <canvas id="stage-canvas" width="380" height="300" role="img" aria-label="Sharpness diagram"></canvas>
+      <div class="stage-scrub" id="stage-scrub" hidden></div>
+    </div>
+    <dl class="summary" id="summary"></dl>
+  </div>
+
+  <section class="section" id="verdict-section" aria-live="polite">
+    <div class="verdict" id="verdict" data-state="pass">
+      <h2 id="verdict-headline">Loading</h2>
+      <p class="detail" id="verdict-detail"></p>
+      <div id="verdict-options"></div>
+    </div>
+  </section>
+
+  <section class="section" id="standard-section">
+    <h2>Sharpness standard</h2>
+    <div class="panel">
+      <div class="segmented" id="tier-picker"></div>
+      <div id="tier-custom" hidden></div>
+      <p class="note" id="tier-note"></p>
+    </div>
+  </section>
+
+  <section class="section" id="panel-subject" role="tabpanel" aria-labelledby="tab-subject">
+    <h2>Subject</h2>
+    <div class="panel">
+      <div class="segmented" id="subject-picker"></div>
+      <div id="subject-controls"></div>
+    </div>
+    <div class="panel">
+      <div id="solve-controls"></div>
+    </div>
+  </section>
+
+  <section class="section" id="panel-free" role="tabpanel" aria-labelledby="tab-free" hidden>
+    <h2>Free calculator</h2>
+    <div class="panel">
+      <div id="free-fields"></div>
+      <p class="note" id="free-note"></p>
+    </div>
+  </section>
+
+  <section class="section" id="details-section">
+    <h2>Details</h2>
+    <div class="panel">
+      <dl id="details"></dl>
+    </div>
+  </section>
+
+  <section class="section" id="stack-section" hidden>
+    <h2>Focus stack</h2>
+    <div class="panel">
+      <div id="stack-summary"></div>
+      <ol id="stack-frames"></ol>
+    </div>
+  </section>
+
+  <section class="section" id="gear-section">
+    <h2>Camera and lens</h2>
+    <div class="panel">
+      <div id="camera-controls"></div>
+    </div>
+    <div class="panel">
+      <div id="lens-controls"></div>
+    </div>
+    <div class="panel">
+      <div id="appearance-controls"></div>
+    </div>
+  </section>
+
+  <section class="section" id="how-section">
+    <h2>How it works</h2>
+    <div class="panel" id="how-body"></div>
+  </section>
+
+</div>
+<script type="module" src="js/app.js"></script>
+</body>
+</html>
