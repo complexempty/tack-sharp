@@ -15,15 +15,12 @@ export const HEAD = {
 };
 
 function ellipse(ctx, map, distance, lateral, depthRadius, widthRadius) {
-  ctx.ellipse(
-    map.x(distance),
-    map.y(lateral),
-    Math.abs(map.x(distance + depthRadius) - map.x(distance)),
-    Math.abs(map.y(widthRadius) - map.y(0)),
-    0,
-    0,
-    Math.PI * 2,
-  );
+  const cx = map.x(distance);
+  const cy = map.y(lateral);
+  const rx = Math.abs(map.x(distance + depthRadius) - map.x(distance));
+  const ry = Math.abs(map.y(widthRadius) - map.y(0));
+  ctx.moveTo(cx + rx, cy);
+  ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2);
 }
 
 export function headShoulders(ctx, map, anchor) {

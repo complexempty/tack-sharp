@@ -1,4 +1,4 @@
-const VERSION = 'v4';
+const VERSION = 'v5';
 const CACHE = `tack-sharp-${VERSION}`;
 
 const SHELL = [

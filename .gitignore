@@ -5,3 +5,4 @@ playwright-report/
 *.log
 Thumbs.db
 desktop.ini
+.tmp/

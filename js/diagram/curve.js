@@ -28,14 +28,16 @@ function evenlySpaced(low, high, units) {
 }
 
 export function axisTicks(map, rect, units) {
-  const low = map.toDistance(rect.x);
+  const leftEdge = map.left === undefined ? rect.x : map.left;
+  const low = map.toDistance(leftEdge);
   const high = map.toDistance(rect.x + rect.w);
   const candidates = Number.isFinite(high) ? evenlySpaced(low, high, units) : ladder(units);
   const ticks = [];
   let lastX = -Infinity;
   for (const distance of candidates) {
+    if (distance < low) continue;
     const px = map.x(distance);
-    if (px < rect.x + 8 || px > rect.x + rect.w - 8) continue;
+    if (px < leftEdge - 1 || px > rect.x + rect.w - 8) continue;
     if (px - lastX < LABEL_GAP) continue;
     lastX = px;
     ticks.push({ distance, px, label: formatMagnitude(displayUnitValue(distance, units)) });
