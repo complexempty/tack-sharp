@@ -12,6 +12,7 @@ import { mountGearPanel } from './ui/gearPanel.js';
 import { mountSummary } from './ui/summary.js';
 import { mountFreePanel } from './ui/freePanel.js';
 import { mountHowItWorks } from './ui/howItWorks.js';
+import { mountDiagram } from './diagram/canvas.js';
 
 function byId(id) {
   return document.getElementById(id);
@@ -82,6 +83,7 @@ function start() {
     }),
     summary: mountSummary({ host: byId('summary') }),
     free: mountFreePanel({ host: byId('free-fields'), noteHost: byId('free-note'), store }),
+    diagram: mountDiagram({ canvas: byId('stage-canvas'), scrubNode: byId('stage-scrub'), store }),
   };
 
   mountTheme(byId('appearance-controls'));
@@ -121,6 +123,7 @@ function start() {
     panels.gear.update(view, state);
     panels.summary.update(view, state);
     panels.free.update(view, state);
+    panels.diagram.update(view, state);
   }
 
   store.subscribe(render);
