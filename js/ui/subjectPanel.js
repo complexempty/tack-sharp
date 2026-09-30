@@ -2,6 +2,8 @@ import { CAR_VIEWS, PORTRAIT_FRAMINGS, SUBJECTS, findSubject } from '../core/sub
 import { formatStop, parseStop, stepStop, stopLabel } from '../core/stops.js';
 import { formatDistance, parseDistance, stepDistance, stepFocalLength } from '../core/units.js';
 import { clear, element, segmented, stepper } from './widgets.js';
+import { lensFor } from '../core/scene.js';
+import { clampFocalLength, maxApertureAt, minApertureAt } from '../lens/profiles.js';
 
 const SOLVE_MODES = [
   { id: 'aperture', name: 'Aperture' },
@@ -218,14 +220,14 @@ export function mountSubjectPanel({ pickerHost, controlsHost, solveHost, store }
     inputMode: 'numeric',
     onStep: (direction) =>
       store.update((draft) => {
-        draft.focalLength = stepFocalLength(store.get().focalLength, direction);
+        draft.focalLength = clampFocalLength(lensFor(draft), stepFocalLength(draft.focalLength, direction));
         if (draft.solveFor === 'focalLength') draft.solveFor = 'check';
       }),
     onCommit: (text) => {
       const value = Number.parseFloat(text);
       if (!Number.isFinite(value) || value <= 0) return;
       store.update((draft) => {
-        draft.focalLength = value;
+        draft.focalLength = clampFocalLength(lensFor(draft), value);
         if (draft.solveFor === 'focalLength') draft.solveFor = 'check';
       });
     },
@@ -235,14 +237,24 @@ export function mountSubjectPanel({ pickerHost, controlsHost, solveHost, store }
     label: 'Aperture',
     onStep: (direction) =>
       store.update((draft) => {
-        draft.aperture = stepStop(store.get().aperture, direction, store.get().apertureMin, store.get().apertureMax);
+        const lens = lensFor(draft);
+        draft.aperture = stepStop(
+          draft.aperture,
+          direction,
+          maxApertureAt(lens, draft.focalLength),
+          minApertureAt(lens, draft.focalLength),
+        );
         if (draft.solveFor === 'aperture') draft.solveFor = 'check';
       }),
     onCommit: (text) => {
       const value = parseStop(text);
       if (value === undefined) return;
       store.update((draft) => {
-        draft.aperture = value;
+        const lens = lensFor(draft);
+        draft.aperture = Math.min(
+          Math.max(value, maxApertureAt(lens, draft.focalLength)),
+          minApertureAt(lens, draft.focalLength),
+        );
         if (draft.solveFor === 'aperture') draft.solveFor = 'check';
       });
     },
@@ -268,7 +280,8 @@ export function mountSubjectPanel({ pickerHost, controlsHost, solveHost, store }
     store,
   );
 
-  solveHost.append(solveRow, apertureModeRow, focalLength.node, aperture.node, focusModeRow, focus.node);
+  const solveNote = element('p', { class: 'note' });
+  solveHost.append(solveRow, apertureModeRow, focalLength.node, aperture.node, focusModeRow, focus.node, solveNote);
 
   return {
     update(view, state) {
@@ -319,7 +332,8 @@ export function mountSubjectPanel({ pickerHost, controlsHost, solveHost, store }
         rangeDepth.setValue(formatDistance(state.subjectState.range.depth, state.units));
       }
 
-      solveMode.update(SOLVE_MODES, state.solveFor);
+      const modes = view.isPrime ? SOLVE_MODES.filter((mode) => mode.id !== 'focalLength') : SOLVE_MODES;
+      solveMode.update(modes, state.solveFor);
       apertureModeRow.hidden = state.solveFor !== 'aperture';
       apertureMode.update(APERTURE_MODES, state.apertureMode);
 
@@ -337,6 +351,17 @@ export function mountSubjectPanel({ pickerHost, controlsHost, solveHost, store }
 
       const focusValue = view.result.ok ? view.result.focusSensor : state.manualFocus;
       focus.setValue(formatDistance(focusValue, state.units), { solved: state.focusMode !== 'manual' });
+
+      if (view.apertureCost) {
+        const stops = view.apertureCost.stops;
+        solveNote.textContent = `At ${Math.round(view.focalLength)} mm this lens opens only to ${formatStop(
+          view.apertureCost.after,
+        )}, ${stops < 0.4 ? 'a third of a stop' : `${stops.toFixed(1)} stops`} slower than at ${Math.round(
+          state.focalLength,
+        )} mm.`;
+      } else {
+        solveNote.textContent = '';
+      }
     },
   };
 }

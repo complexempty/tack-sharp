@@ -1,9 +1,8 @@
 import { CAMERAS, megapixels, pixelPitch } from '../data/cameras.js';
-import { formatStop, parseStop, stepStop } from '../core/stops.js';
 import { formatMicrons } from '../core/units.js';
 import { element, stepper, switchRow } from './widgets.js';
 
-export function mountGearPanel({ cameraHost, lensHost, store }) {
+export function mountGearPanel({ cameraHost, store }) {
   const select = element('select', { class: 'select', 'aria-label': 'Camera' });
   for (const camera of CAMERAS) select.append(element('option', { value: camera.id, text: camera.name }));
   select.append(element('option', { value: 'custom', text: 'Custom' }));
@@ -44,44 +43,6 @@ export function mountGearPanel({ cameraHost, lensHost, store }) {
 
   cameraHost.append(cameraRow, ...sensorFields.map((field) => field.control.node), pitchNote, diffraction.node);
 
-  const lensNote = element('p', {
-    class: 'note',
-    text: 'Perfect lens: no aberration, just defocus and diffraction. Measured lens profiles arrive in phase 2.',
-  });
-
-  const widest = stepper({
-    label: 'Widest aperture',
-    onStep: (direction) =>
-      store.update((draft) => {
-        const next = stepStop(draft.apertureMin, direction, undefined, undefined);
-        draft.apertureMin = Math.min(next, draft.apertureMax);
-      }),
-    onCommit: (text) => {
-      const value = parseStop(text);
-      if (value === undefined) return;
-      store.update((draft) => {
-        draft.apertureMin = Math.min(value, draft.apertureMax);
-      });
-    },
-  });
-
-  const smallest = stepper({
-    label: 'Smallest aperture',
-    onStep: (direction) =>
-      store.update((draft) => {
-        const next = stepStop(draft.apertureMax, direction, undefined, undefined);
-        draft.apertureMax = Math.max(next, draft.apertureMin);
-      }),
-    onCommit: (text) => {
-      const value = parseStop(text);
-      if (value === undefined) return;
-      store.update((draft) => {
-        draft.apertureMax = Math.max(value, draft.apertureMin);
-      });
-    },
-  });
-
-  lensHost.append(lensNote, widest.node, smallest.node);
 
   return {
     update(view, state) {
@@ -96,8 +57,6 @@ export function mountGearPanel({ cameraHost, lensHost, store }) {
         pixelPitch(view.camera),
       )} pixel pitch.`;
       diffraction.setChecked(state.diffraction);
-      widest.setValue(formatStop(state.apertureMin));
-      smallest.setValue(formatStop(state.apertureMax));
     },
   };
 }

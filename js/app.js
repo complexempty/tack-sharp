@@ -13,6 +13,7 @@ import { mountSummary } from './ui/summary.js';
 import { mountFreePanel } from './ui/freePanel.js';
 import { mountHowItWorks } from './ui/howItWorks.js';
 import { mountDiagram } from './diagram/canvas.js';
+import { mountFramePosition, mountLensPanel } from './ui/lensPanel.js';
 
 function byId(id) {
   return document.getElementById(id);
@@ -76,11 +77,9 @@ function start() {
       noteHost: byId('tier-note'),
       store,
     }),
-    gear: mountGearPanel({
-      cameraHost: byId('camera-controls'),
-      lensHost: byId('lens-controls'),
-      store,
-    }),
+    gear: mountGearPanel({ cameraHost: byId('camera-controls'), store }),
+    lens: mountLensPanel({ host: byId('lens-controls'), store }),
+    framePosition: mountFramePosition({ host: byId('subject-controls'), store }),
     summary: mountSummary({ host: byId('summary') }),
     free: mountFreePanel({ host: byId('free-fields'), noteHost: byId('free-note'), store }),
     diagram: mountDiagram({ canvas: byId('stage-canvas'), scrubNode: byId('stage-scrub'), store }),
@@ -121,6 +120,8 @@ function start() {
     panels.stack.update(view, state);
     if (!subjectMode) byId('stack-section').hidden = true;
     panels.gear.update(view, state);
+    panels.lens.update(view, state);
+    panels.framePosition.update(view, state);
     panels.summary.update(view, state);
     panels.free.update(view, state);
     panels.diagram.update(view, state);

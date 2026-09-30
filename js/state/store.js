@@ -2,6 +2,7 @@ import { DEFAULT_CAMERA_ID } from '../data/cameras.js';
 import { DEFAULT_TIER_ID } from '../data/tiers.js';
 import { DEFAULT_SUBJECT_STATE } from '../core/subjects.js';
 import { NARROWEST_STOP, WIDEST_STOP } from '../core/stops.js';
+import { PERFECT_LENS_ID } from '../lens/profiles.js';
 import { load, mergeDefaults, save } from './persist.js';
 
 const KEY = 'tacksharp.state';
@@ -16,6 +17,9 @@ export const DEFAULT_STATE = {
   diffraction: true,
   apertureMin: WIDEST_STOP,
   apertureMax: NARROWEST_STOP,
+  lensId: PERFECT_LENS_ID,
+  framePosition: 'center',
+  lenses: [],
   subject: 'portrait',
   subjectState: DEFAULT_SUBJECT_STATE,
   focalLength: 85,

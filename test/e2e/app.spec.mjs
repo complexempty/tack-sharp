@@ -16,18 +16,22 @@ function watchErrors(page) {
   return found;
 }
 
-async function open(page, theme) {
-  await page.addInitScript((value) => {
-    try {
-      localStorage.setItem('tacksharp.theme', value);
-      if (!sessionStorage.getItem('tacksharp.test.seeded')) {
-        localStorage.removeItem('tacksharp.state');
-        sessionStorage.setItem('tacksharp.test.seeded', '1');
+async function open(page, theme, seedState) {
+  await page.addInitScript(
+    ({ value, seed }) => {
+      try {
+        localStorage.setItem('tacksharp.theme', value);
+        if (!sessionStorage.getItem('tacksharp.test.seeded')) {
+          if (seed) localStorage.setItem('tacksharp.state', JSON.stringify(seed));
+          else localStorage.removeItem('tacksharp.state');
+          sessionStorage.setItem('tacksharp.test.seeded', '1');
+        }
+      } catch (error) {
+        return;
       }
-    } catch (error) {
-      return;
-    }
-  }, theme);
+    },
+    { value: theme, seed: seedState },
+  );
   await page.goto('/');
   await expect(page.locator('#verdict-headline')).not.toBeEmpty();
 }
@@ -155,6 +159,49 @@ test.describe('Tack Sharp', () => {
     expect(errors).toEqual([]);
 
     await context.close();
+  });
+
+  test('choosing a lens constrains the controls and explains itself', async ({ page }, info) => {
+    const errors = watchErrors(page);
+    await open(page, info.project.name);
+
+    const lensSelect = page.locator('#lens-controls select');
+    await expect(lensSelect.locator('option')).toHaveCount(3);
+    await expect(page.locator('#subject-controls .field', { hasText: 'Where in the frame' })).toBeHidden();
+
+    await lensSelect.selectOption('sony-fe-200-600-g');
+    await expect(page.locator('#subject-controls .field', { hasText: 'Where in the frame' })).toBeVisible();
+    await expect(page.locator('#lens-controls .note').first()).toContainText('200 to 600 mm');
+    await expect(page.locator('#lens-controls .note').first()).toContainText('f/5.6');
+    await expect(page.locator('#lens-controls .note').nth(1)).toContainText('Not calibrated yet');
+
+    const focalInput = page
+      .locator('#solve-controls .field', { hasText: 'Focal length' })
+      .locator('input');
+    await expect(focalInput).toHaveValue('200 mm');
+    await expect(page.locator('#verdict-headline')).toHaveText('Inside the lens minimum focus distance');
+
+    expect(errors).toEqual([]);
+  });
+
+  test('a zoom reports the maximum aperture it costs to zoom in', async ({ page }, info) => {
+    await open(page, info.project.name, {
+      lensId: 'sony-fe-200-600-g',
+      focalLength: 200,
+      aperture: 8,
+      subject: 'range',
+      tierId: 'standard',
+      solveFor: 'focalLength',
+      units: 'm',
+      subjectState: { range: { distance: 30480, depth: 2000, infinite: false } },
+    });
+
+    const focalInput = page
+      .locator('#solve-controls .field', { hasText: 'Focal length' })
+      .locator('input');
+    await expect(focalInput).toHaveValue('468 mm');
+    await expect(page.locator('#solve-controls .note')).toContainText('opens only to f/6.3');
+    await expect(page.locator('#solve-controls .note')).toContainText('slower than at 200 mm');
   });
 
   test('key states are captured for review', async ({ page }, info) => {

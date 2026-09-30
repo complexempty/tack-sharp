@@ -236,7 +236,8 @@ How it works: explain the blur model, the tiers, best-point focus, sensor-plane 
   - Primes fix the focal length, which disables Solve for Focal length.
   - Zooms constrain focal-length results to their range, and report when a focal-length result costs maximum aperture.
 - Frame position selector next to the subject controls: Center / Edge / Corner. Default: Center. Zones by normalized image height ρ = radius / half-diagonal: center ρ ≤ 0.3, edge 0.3 < ρ ≤ 0.8, corner ρ > 0.8.
-- Interpolate a in log N between measured stops, and hold the end values outside the measured range. For zooms, interpolate between measured focal lengths.
+- Interpolate a in log N between measured stops, and hold the end values outside the measured range. For zooms, interpolate between measured focal lengths, bracketing on the focal lengths actually measured at that frame position. A position with no measurements falls back to zero rather than borrowing another position's numbers.
+- An uncalibrated profile reports a constant zero aberration, which keeps the closed-form aperture window in play. Once measurements exist the aberration varies with aperture, so the solver switches to scanning the marked stops. Solving for focal length therefore takes a scene factory, not a fixed scene, because aberration, aperture range and minimum focus all move with focal length.
 - In the diagram, the floor becomes lens plus diffraction. "Sharpest" becomes the real peak for that lens and frame position.
 
 ## I. Calibration from test photos (phase 3)

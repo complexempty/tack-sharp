@@ -5,6 +5,26 @@ import { stackAperture, stackPlan } from './stack.js';
 import { alwaysWholeScene, subjectNoun, targetsFor } from './subjects.js';
 import { formatDistance, formatOffset } from './units.js';
 import { DIFFRACTION_K } from './optics.js';
+import {
+  SEEDED_PROFILES,
+  aberrationFor,
+  apertureCostOfZooming,
+  clampFocalLength,
+  isPrime,
+  maxApertureAt,
+  minApertureAt,
+  minFocusAt,
+  perfectLens,
+} from '../lens/profiles.js';
+
+export function availableLenses(state) {
+  return [perfectLens(state.apertureMin, state.apertureMax), ...SEEDED_PROFILES, ...(state.lenses || [])];
+}
+
+export function lensFor(state) {
+  const list = availableLenses(state);
+  return list.find((lens) => lens.id === state.lensId) || list[0];
+}
 
 export function cameraFor(state) {
   return state.cameraId === 'custom' ? { id: 'custom', name: 'Custom', ...state.customCamera } : findCamera(state.cameraId);
@@ -22,16 +42,20 @@ function baseOptions(state, limit, overrides = {}) {
       : state.focusMode === 'anchor'
         ? targets.anchor
         : undefined;
+  const lens = lensFor(state);
+  const focalLength = clampFocalLength(lens, overrides.focalLength ?? state.focalLength);
   return makeScene({
     near: targets.near,
     far: targets.far,
-    focalLength: overrides.focalLength ?? state.focalLength,
+    focalLength,
     aperture: overrides.aperture ?? state.aperture,
     limit,
     diffraction: state.diffraction,
-    focus: overrides.focus === undefined ? focus : overrides.focus,
-    apertureMin: state.apertureMin,
-    apertureMax: state.apertureMax,
+    focus: overrides.focus === undefined ? focus : overrides.focus ?? undefined,
+    apertureMin: maxApertureAt(lens, focalLength),
+    apertureMax: minApertureAt(lens, focalLength),
+    minFocusDistance: minFocusAt(lens, focalLength),
+    aberrationAt: aberrationFor(lens, focalLength, state.framePosition),
   });
 }
 
@@ -64,7 +88,7 @@ function stepBackOption(state, limit, aperture) {
     baseOptions(state, limit, {
       targets: targetsFor(state.subject, state.subjectState, distance),
       aperture,
-      focus: state.focusMode === 'manual' ? undefined : undefined,
+      focus: null,
     }),
   );
   if (!solved.ok) return undefined;
@@ -96,7 +120,11 @@ export function computeView(state) {
     result = solveAperture(baseOptions(state, limit), state.apertureMode);
     solvedField = 'aperture';
   } else if (state.solveFor === 'focalLength') {
-    result = solveFocalLength(baseOptions(state, limit), state.lensFocalBounds);
+    const lens = lensFor(state);
+    result = solveFocalLength((focalLength) => baseOptions(state, limit, { focalLength }), {
+      min: lens.focal.min,
+      max: lens.focal.max,
+    });
     solvedField = 'focalLength';
   } else if (state.solveFor === 'distance') {
     result = solveDistance((distance) =>
@@ -108,8 +136,11 @@ export function computeView(state) {
     result = evaluate(baseOptions(state, limit));
   }
 
+  const lens = lensFor(state);
   const view = {
     camera,
+    lens,
+    isPrime: isPrime(lens),
     pitch,
     limit,
     targets,
@@ -126,6 +157,10 @@ export function computeView(state) {
 
   if (!result.ok) return view;
 
+  if (state.solveFor === 'focalLength' && !lens.perfect) {
+    view.apertureCost = apertureCostOfZooming(lens, state.focalLength, result.focalLength);
+  }
+
   view.ratio = result.blur / limit;
   view.state = result.state;
 
@@ -137,8 +172,9 @@ export function computeView(state) {
       limit,
       k: state.diffraction ? DIFFRACTION_K : 0,
       m: result.magnification,
-      apertureMin: state.apertureMin,
-      apertureMax: state.apertureMax,
+      apertureMin: maxApertureAt(lens, result.focalLength),
+      apertureMax: minApertureAt(lens, result.focalLength),
+      aberrationAt: aberrationFor(lens, result.focalLength, state.framePosition),
     });
     const stepAperture = feasibleAperture || (fallbackStop ? fallbackStop.value : result.sharpest.aperture);
     view.options.stepBack = stepBackOption(state, limit, stepAperture);
@@ -151,6 +187,7 @@ export function computeView(state) {
         aperture: fallbackStop.value,
         limit,
         k: state.diffraction ? DIFFRACTION_K : 0,
+        aberrationAt: aberrationFor(lens, result.focalLength, state.framePosition),
       });
       if (plan.ok) view.options.stack = { ...plan, stop: fallbackStop };
     }

@@ -1,4 +1,4 @@
-const VERSION = 'v5';
+const VERSION = 'v6';
 const CACHE = `tack-sharp-${VERSION}`;
 
 const SHELL = [
@@ -43,6 +43,9 @@ const SHELL = [
   'js/diagram/wholescene.js',
   'js/diagram/curve.js',
   'js/diagram/silhouettes.js',
+  'js/lens/profiles.js',
+  'js/lens/interp.js',
+  'js/ui/lensPanel.js',
 ];
 
 const ASSETS = [

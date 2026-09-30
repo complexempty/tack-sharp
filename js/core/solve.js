@@ -225,18 +225,19 @@ export function solveAperture(scene, mode = 'widest') {
   return evaluate({ ...scene, aperture: base.workingStops[0].value });
 }
 
-export function solveFocalLength(scene, bounds = {}) {
+export function solveFocalLength(sceneFor, bounds = {}) {
+  const build = typeof sceneFor === 'function' ? sceneFor : (focalLength) => ({ ...sceneFor, focalLength });
   const low = Math.max(bounds.min || MIN_FOCAL_LENGTH, 1);
   const high = bounds.max || MAX_FOCAL_LENGTH;
   const works = (focalLength) => {
-    const result = evaluate({ ...scene, focalLength });
+    const result = evaluate(build(focalLength));
     return result.ok && result.blur <= result.limit;
   };
   const exact = largestPassing(works, low, high);
   if (Number.isNaN(exact)) return { ok: false, error: 'no-focal-length', tried: { low, high } };
   const rounded = Math.max(low, Math.floor(exact));
   const chosen = works(rounded) ? rounded : Math.floor(exact * 1000) / 1000;
-  return evaluate({ ...scene, focalLength: chosen });
+  return evaluate(build(chosen));
 }
 
 export function solveDistance(makeScene, bounds = {}) {
